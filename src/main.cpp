@@ -54,7 +54,10 @@ void applicationTask(void *param)
         // wait for some audio samples to arrive
         uint32_t ulNotificationValue = ulTaskNotifyTake(pdTRUE, xMaxBlockTime);
         if (ulNotificationValue > 0)
-        {
+        { 
+            digitalWrite(GPIO_NUM_12, HIGH);
+            vTaskDelay(300);
+            digitalWrite(GPIO_NUM_12, LOW);
             commandDetector->run();
         }
     }
@@ -86,7 +89,8 @@ void setup()
 
     // set up the i2s sample writer task
     TaskHandle_t applicationTaskHandle;
-    xTaskCreatePinnedToCore(applicationTask, "Command Detect", 8192, commandDetector, 1, &applicationTaskHandle, 0);
+    xTaskCreate(applicationTask, "Command Detect", 8192, commandDetector, 1, &applicationTaskHandle);
+
 
     // start sampling from i2s device - use I2S_NUM_0 as that's the one that supports the internal ADC
 #ifdef USE_I2S_MIC_INPUT
